@@ -29,41 +29,38 @@ end)
 -- editor settings
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-
-local opt = vim.opt
-opt.number = true
-opt.relativenumber = true
-opt.mouse = 'a'
-opt.showmode = false
-opt.clipboard = 'unnamedplus'
-opt.breakindent = true
-opt.undofile = true
-opt.ignorecase = true
-opt.smartcase = true
-opt.signcolumn = 'yes'
-opt.updatetime = 250
-opt.timeoutlen = 300
-opt.splitright = true
-opt.splitbelow = true
-opt.list = true
-opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
-opt.inccommand = 'split'
-opt.cursorline = true
-opt.scrolloff = 10
+vim.opt.number = true
+vim.opt.relativenumber = true
+vim.opt.mouse = 'a'
+vim.opt.showmode = false
+vim.opt.clipboard = 'unnamedplus'
+vim.opt.breakindent = true
+vim.opt.undofile = true
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+vim.opt.signcolumn = 'yes'
+vim.opt.updatetime = 250
+vim.opt.timeoutlen = 300
+vim.opt.splitright = true
+vim.opt.splitbelow = true
+vim.opt.list = true
+vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+vim.opt.inccommand = 'split'
+vim.opt.cursorline = true
+vim.opt.scrolloff = 10
 
 -- keymaps
 local set = vim.keymap.set
 set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
-
 set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Prev Diagnostic' })
 set('n', ']d', vim.diagnostic.goto_next, { desc = 'Next Diagnostic' })
 set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show Diagnostic Error' })
 set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open Diagnostic List' })
 
--- [[ 5. Telescope ]]
+-- telescope keyamps
 later(function()
-  pcall(require, 'telescope') -- Ensure telescope is safe
+  pcall(require, 'telescope')
   local builtin = require('telescope.builtin')
   set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
   set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
@@ -91,7 +88,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     local map = function(keys, func, desc) set('n', keys, func, { buffer = bufnr, desc = 'LSP: ' .. desc }) end
 
     map('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
-    map('K',  vim.lsp.buf.hover,      'Hover Documentation')
+    map('K', vim.lsp.buf.hover, 'Hover Documentation')
     map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
     map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
     map('gr', function() require('telescope.builtin').lsp_references() end, '[G]oto [R]eferences')
@@ -105,7 +102,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
--- [[ 8. Mini Modules & Treesitter ]]
+-- configure treesitter and mini-submodules
 later(function()
   local status, ts = pcall(require, 'nvim-treesitter.configs')
   if status then
@@ -126,7 +123,7 @@ later(function()
         local mode, mode_hl = MiniStatusline.section_mode({ trunc_width = 120 })
         local git           = MiniStatusline.section_git({ trunc_width = 75 })
         local filename      = MiniStatusline.section_filename({ trunc_width = 140 })
-        local location      = '%l│%v' 
+        local location      = '%l│%v' -- short format
         return MiniStatusline.combine_groups({
           { hl = mode_hl, strings = { mode } },
           { hl = 'MiniStatuslineDevinfo', strings = { git } },
