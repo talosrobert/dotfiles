@@ -2,6 +2,7 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.opt.number = true
+vim.opt.relativenumber = true
 vim.opt.mouse = 'a'
 vim.opt.undofile = true
 vim.opt.ignorecase = true
@@ -12,6 +13,23 @@ vim.opt.timeoutlen = 300
 vim.opt.splitright = true
 vim.opt.splitbelow = true
 vim.opt.clipboard = 'unnamedplus' -- system copy-paste
+
+-- relative number toggle
+local numbergroup = vim.api.nvim_create_augroup('numbertoggle', { clear = true })
+vim.api.nvim_create_autocmd({ 'BufEnter', 'FocusGained', 'InsertLeave', 'WinEnter' }, {
+  pattern = '*',
+  group = numbergroup,
+  callback = function()
+    if vim.opt.number:get() then vim.opt.relativenumber = true end
+  end,
+})
+vim.api.nvim_create_autocmd({ 'BufLeave', 'FocusLost', 'InsertEnter', 'WinLeave' }, {
+  pattern = '*',
+  group = numbergroup,
+  callback = function()
+    if vim.opt.number:get() then vim.opt.relativenumber = false end
+  end,
+})
 
 -- bootstrap lazy
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -25,7 +43,13 @@ require('lazy').setup({
   { 'folke/tokyonight.nvim', priority = 1000, config = function() vim.cmd.colorscheme 'tokyonight-night' end },
   { 'neovim/nvim-lspconfig' },
   { 'saghen/blink.cmp', version = '*', opts = { sources = { default = { 'lsp', 'path', 'snippets', 'buffer' } } } },
-  { 'stevearc/conform.nvim', opts = { formatters_by_ft = { terraform = { 'terraform_fmt' }, go = { 'gofmt' } }, format_on_save = { timeout_ms = 500, lsp_fallback = true } } },
+  { 
+    'stevearc/conform.nvim', 
+    opts = { 
+      formatters_by_ft = { terraform = { 'terraform_fmt' }, go = { 'gofmt' } }, 
+      format_on_save = { timeout_ms = 500, lsp_fallback = true } 
+    } 
+  },
   { 
     'nvim-treesitter/nvim-treesitter', 
     build = ':TSUpdate', 
