@@ -12,6 +12,10 @@ vim.opt.updatetime = 250
 vim.opt.timeoutlen = 300
 vim.opt.splitright = true
 vim.opt.splitbelow = true
+vim.opt.ts = 4
+vim.opt.sts = 4
+vim.opt.sw = 4
+vim.opt.et = true
 vim.opt.clipboard = 'unnamedplus' -- system copy-paste
 
 -- relative number toggle
@@ -56,7 +60,7 @@ require('lazy').setup({
     config = function() 
       require('nvim-treesitter').setup { 
         highlight = { enable = true }, 
-        ensure_installed = { 'terraform', 'go', 'lua', 'vim', 'vimdoc' } 
+        ensure_installed = { 'terraform', 'go', 'yaml', 'lua', 'vim', 'vimdoc' } 
       } 
     end 
   },
