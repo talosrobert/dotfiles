@@ -6,6 +6,13 @@ user_pref("widget.dmabuf.force-enabled", true);
 // GPU Compositing
 user_pref("gfx.webrender.all", true);
 user_pref("layers.gpu-process.enabled", true);
+// Disable forced compositor — causes memory leaks on Intel iGPUs
+user_pref("gfx.webrender.compositor.force-enabled", false);
+
+// Memory & Process Management
+user_pref("dom.ipc.processCount", 4);
+user_pref("browser.tabs.unloadOnLowMemory", true);
+user_pref("browser.low_commit_space_threshold_mb", 4096);
 
 // WebRTC Camera Performance
 user_pref("media.navigator.mediadatadecoder_vpx_enabled", true);
