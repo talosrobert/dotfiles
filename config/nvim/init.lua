@@ -50,7 +50,7 @@ require('lazy').setup({
   { 
     'stevearc/conform.nvim', 
     opts = { 
-      formatters_by_ft = { terraform = { 'terraform_fmt' }, go = { 'gofmt' } }, 
+      formatters_by_ft = { terraform = { 'terraform_fmt' }, go = { 'gofmt' }, zig = { 'zigfmt' } },
       format_on_save = { timeout_ms = 500, lsp_fallback = true } 
     } 
   },
@@ -60,7 +60,7 @@ require('lazy').setup({
     config = function() 
       require('nvim-treesitter').setup { 
         highlight = { enable = true }, 
-        ensure_installed = { 'terraform', 'go', 'yaml', 'lua', 'vim', 'vimdoc' } 
+        ensure_installed = { 'terraform', 'go', 'yaml', 'lua', 'vim', 'vimdoc', 'zig' } 
       } 
     end 
   },
@@ -109,6 +109,14 @@ vim.lsp.config('gopls', {
   on_attach = on_attach,
 })
 vim.lsp.enable('gopls')
+
+-- zig setup
+vim.lsp.config('zls', {
+  cmd = { vim.fn.expand('~/.local/bin/zls') },
+  on_attach = on_attach,
+  root_dir = vim.fs.root(0, { 'build.zig', 'build.zig.zon' }),
+})
+vim.lsp.enable('zls')
 
 -- diagnostic maps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'prev diagnostic' })

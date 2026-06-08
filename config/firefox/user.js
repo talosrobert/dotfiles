@@ -15,5 +15,12 @@ user_pref("browser.tabs.unloadOnLowMemory", true);
 user_pref("browser.low_commit_space_threshold_mb", 4096);
 
 // WebRTC Camera Performance
-user_pref("media.navigator.mediadatadecoder_vpx_enabled", true);
+// Was true; flipped false — CometLake VP9 hw decode in WebRTC freezes (Mozilla bug 1680313).
+// HTML5 video (YouTube) still uses VAAPI via media.ffmpeg.vaapi.enabled.
+user_pref("media.navigator.mediadatadecoder_vpx_enabled", false);
 user_pref("media.webrtc.camera.allow-pipewire", true);
+
+// WebRTC Audio Processing (disable — Google Meet handles AEC/noise/HPF itself)
+user_pref("media.getusermedia.aec_enabled", false);
+user_pref("media.getusermedia.noise_enabled", false);
+user_pref("media.getusermedia.audio.processing.hpf.enabled", false);
