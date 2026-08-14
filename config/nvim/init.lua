@@ -99,7 +99,6 @@ end
 vim.lsp.config('terraformls', {
   cmd = { '/usr/bin/terraform-ls', 'serve' },
   on_attach = on_attach,
-  root_dir = vim.fs.root(0, { '.terraform', '.terraform.lock.hcl', 'main.tf' }),
 })
 vim.lsp.enable('terraformls')
 
@@ -114,9 +113,17 @@ vim.lsp.enable('gopls')
 vim.lsp.config('zls', {
   cmd = { vim.fn.expand('~/.local/bin/zls') },
   on_attach = on_attach,
-  root_dir = vim.fs.root(0, { 'build.zig', 'build.zig.zon' }),
 })
 vim.lsp.enable('zls')
+
+-- ZLS doesn't handle LSP shutdown request (returns InvalidRequest)
+vim.api.nvim_create_autocmd('VimLeavePre', {
+  callback = function()
+    for _, client in ipairs(vim.lsp.get_clients({ name = 'zls' })) do
+      client:stop(true)
+    end
+  end,
+})
 
 -- diagnostic maps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'prev diagnostic' })

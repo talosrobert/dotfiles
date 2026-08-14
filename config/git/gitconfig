@@ -1,0 +1,13 @@
+# ~/.git/config
+[user]
+	name = talosrobert
+	email = 29042337+talosrobert@users.noreply.github.com
+[core]
+  editor = vim
+[init]
+  defaultBranch = main
+[pull]
+  rebase = true
+[alias]
+  mr = push -u origin HEAD
+  re = !git switch $(git rev-parse --abbrev-ref origin/HEAD | awk -F'/' '{print $NF}') && git pull
