@@ -47,22 +47,26 @@ require('lazy').setup({
   { 'folke/tokyonight.nvim', priority = 1000, config = function() vim.cmd.colorscheme 'tokyonight-night' end },
   { 'neovim/nvim-lspconfig' },
   { 'saghen/blink.cmp', version = '*', opts = { sources = { default = { 'lsp', 'path', 'snippets', 'buffer' } } } },
-  { 
-    'stevearc/conform.nvim', 
-    opts = { 
-      formatters_by_ft = { terraform = { 'terraform_fmt' }, go = { 'gofmt' }, zig = { 'zigfmt' } },
-      format_on_save = { timeout_ms = 500, lsp_fallback = true } 
-    } 
+  {
+    'stevearc/conform.nvim',
+    opts = {
+      formatters_by_ft = { terraform = { 'terraform_fmt' }, ['terraform-vars'] = { 'terraform_fmt' }, go = { 'gofmt' } },
+      format_on_save = { timeout_ms = 500, lsp_format = 'fallback' }
+    }
   },
-  { 
-    'nvim-treesitter/nvim-treesitter', 
-    build = ':TSUpdate', 
-    config = function() 
-      require('nvim-treesitter').setup { 
-        highlight = { enable = true }, 
-        ensure_installed = { 'terraform', 'go', 'yaml', 'lua', 'vim', 'vimdoc', 'zig' } 
-      } 
-    end 
+  {
+    'nvim-treesitter/nvim-treesitter',
+    lazy = false,
+    build = ':TSUpdate',
+    config = function()
+      -- main branch: setup() takes install_dir only; parsers via install(), highlight via vim.treesitter.start()
+      require('nvim-treesitter').install { 'go', 'gomod', 'terraform', 'yaml' }
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = { 'go', 'gomod', 'terraform', 'yaml' },
+        -- pcall: parser may still be installing on first launch
+        callback = function() pcall(vim.treesitter.start) end,
+      })
+    end
   },
   { 'nvim-telescope/telescope.nvim', dependencies = { 'nvim-lua/plenary.nvim' }, config = function()
       require('telescope').setup {
@@ -109,23 +113,21 @@ vim.lsp.config('gopls', {
 })
 vim.lsp.enable('gopls')
 
--- zig setup
-vim.lsp.config('zls', {
-  cmd = { vim.fn.expand('~/.local/bin/zls') },
+-- lua setup (lua-language-server in ~/.local/bin, resolved via PATH)
+vim.lsp.config('lua_ls', {
   on_attach = on_attach,
+  settings = {
+    Lua = {
+      runtime = { version = 'LuaJIT' },
+      -- nvim runtime on library path so `vim` global resolves in init.lua
+      workspace = { library = { vim.env.VIMRUNTIME } },
+    },
+  },
 })
-vim.lsp.enable('zls')
+vim.lsp.enable('lua_ls')
 
--- ZLS doesn't handle LSP shutdown request (returns InvalidRequest)
-vim.api.nvim_create_autocmd('VimLeavePre', {
-  callback = function()
-    for _, client in ipairs(vim.lsp.get_clients({ name = 'zls' })) do
-      client:stop(true)
-    end
-  end,
-})
-
--- diagnostic maps
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'prev diagnostic' })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'next diagnostic' })
+-- diagnostics
+vim.diagnostic.config({ virtual_text = true }) -- off by default since 0.11
+vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end, { desc = 'prev diagnostic' })
+vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count = 1, float = true }) end, { desc = 'next diagnostic' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'show diagnostic error' })
